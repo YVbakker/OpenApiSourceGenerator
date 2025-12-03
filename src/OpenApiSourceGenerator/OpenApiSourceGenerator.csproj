@@ -1,0 +1,76 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <IsPackable>true</IsPackable>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+
+        <Version>0.0.1-alpha</Version>
+        <Authors>Yael Bakker</Authors>
+        <Description>A C# source generator that automatically generates strongly-typed C# classes
+            from OpenAPI specifications at compile time. Supports OpenAPI 3.x with YAML and JSON
+            formats.</Description>
+        <Copyright>Copyright (c) 2025 Yael Bakker</Copyright>
+        <PackageProjectUrl>https://github.com/yourusername/OpenApiSourceGenerator</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/yourusername/OpenApiSourceGenerator</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>Readme.md</PackageReadmeFile>
+        <PackageTags>openapi;source-generator;roslyn;code-generation;swagger;api;c#;dotnet</PackageTags>
+        <PackageReleaseNotes>Initial release of OpenApiSourceGenerator.
+            Features:
+            - Compile-time source generation from OpenAPI 3.x specifications
+            - Support for YAML and JSON formats
+            - Automatic C# class generation from schemas
+            - Zero runtime overhead</PackageReleaseNotes>
+
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+        <IsRoslynComponent>true</IsRoslynComponent>
+
+        <RootNamespace>OpenApiSourceGenerator</RootNamespace>
+        <PackageId>OpenApiSourceGenerator</PackageId>
+
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <DevelopmentDependency>true</DevelopmentDependency>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="Readme.md" Pack="true" PackagePath="\" />
+        <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true"
+            PackagePath="analyzers/dotnet/cs" Visible="false" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.0"
+            PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.3.0"
+            PrivateAssets="all" />
+        <PackageReference Include="Microsoft.OpenApi" Version="2.3.6" PrivateAssets="all"
+            GeneratePathProperty="true" />
+        <PackageReference Include="Microsoft.OpenApi.YamlReader" Version="2.3.6" PrivateAssets="all"
+            GeneratePathProperty="true" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
+    </PropertyGroup>
+
+    <Target Name="GetDependencyTargetPaths">
+        <ItemGroup>
+            <TargetPathWithTargetPlatformMoniker
+                Include="$(PKGMicrosoft_OpenApi)\lib\netstandard2.0\*.dll"
+                IncludeRuntimeDependency="false" />
+            <TargetPathWithTargetPlatformMoniker
+                Include="$(PKGMicrosoft_OpenApi_YamlReader)\lib\netstandard2.0\*.dll"
+                IncludeRuntimeDependency="false" />
+        </ItemGroup>
+    </Target>
+
+</Project>

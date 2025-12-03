@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <RootNamespace>OpenApiSourceGenerator.Sample</RootNamespace>
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    </PropertyGroup>
+
+<!--    <ItemGroup>-->
+<!--        <ProjectReference Include="..\OpenApiSourceGenerator\OpenApiSourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>-->
+<!--    </ItemGroup>-->
+
+    <ItemGroup>
+        <ProjectReference Include="..\OpenApiSourceGenerator\OpenApiSourceGenerator.csproj"
+                          OutputItemType="Analyzer"
+                          ReferenceOutputAssembly="false" />
+        <Analyzer Include="..\OpenApiSourceGenerator\bin\Debug\netstandard2.0\Microsoft.OpenApi.dll" />
+        <Analyzer Include="..\OpenApiSourceGenerator\bin\Debug\netstandard2.0\Microsoft.OpenApi.YamlReader.dll" />
+        <Analyzer Include="..\OpenApiSourceGenerator\bin\Debug\netstandard2.0\SharpYaml.dll" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <None Remove="DDD.UbiquitousLanguageRegistry.txt"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="openapi\openapi.yaml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.OpenApi" Version="2.3.5" />
+    </ItemGroup>
+
+</Project>

@@ -12,11 +12,11 @@
             from OpenAPI specifications at compile time. Supports OpenAPI 3.x with YAML and JSON
             formats.</Description>
         <Copyright>Copyright (c) 2025 Yael Bakker</Copyright>
-        <PackageProjectUrl>https://github.com/yourusername/OpenApiSourceGenerator</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/yourusername/OpenApiSourceGenerator</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/YVbakker/OpenApiSourceGenerator</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/YVbakker/OpenApiSourceGenerator</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageReadmeFile>Readme.md</PackageReadmeFile>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>openapi;source-generator;roslyn;code-generation;swagger;api;c#;dotnet</PackageTags>
         <PackageReleaseNotes>Initial release of OpenApiSourceGenerator.
             Features:
@@ -38,7 +38,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="Readme.md" Pack="true" PackagePath="\" />
+        <None Include="../../README.md" Pack="true" PackagePath="\" />
         <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true"
             PackagePath="analyzers/dotnet/cs" Visible="false" />
     </ItemGroup>

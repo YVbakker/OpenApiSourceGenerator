@@ -1,5 +1,6 @@
 using System;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.OpenApi;
 
 namespace OpenApiSourceGenerator.Mappers;

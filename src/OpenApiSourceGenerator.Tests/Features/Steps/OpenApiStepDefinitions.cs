@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using OpenApiSourceGenerator;
 using Reqnroll;
@@ -49,8 +50,8 @@ public sealed class OpenApiStepDefinitions(ScenarioContext scenarioContext)
         scenarioContext["Diagnostics"] = diagnostics;
     }
 
-    [Then("the following code should be generated:")]
-    public void ThenTheFollowingCodeShouldBeGenerated(string expectedCode)
+    [Then("the following code should be generated for the class {word}:")]
+    public void ThenTheFollowingCodeShouldBeGenerated(string className, string expectedCode)
     {
         var newCompilation = (Compilation)scenarioContext["GeneratedCompilation"];
         
@@ -65,11 +66,17 @@ public sealed class OpenApiStepDefinitions(ScenarioContext scenarioContext)
             throw new Exception("No code was generated");
         }
 
-        // Get the generated code and normalize it
-        var generatedCode = generatedTrees.First().ToString();
+        // Get the generated code for the specified class
+        
+        var generatedCode = generatedTrees.First(t =>
+            t.GetRoot()
+                .DescendantNodes()
+                .OfType<ClassDeclarationSyntax>()
+                .Any(c => c.Identifier.ValueText == className)
+        );
         
         // Parse both into syntax trees
-        var generatedTree = CSharpSyntaxTree.ParseText(generatedCode);
+        var generatedTree = CSharpSyntaxTree.ParseText(generatedCode.ToString());
         var expectedTree = CSharpSyntaxTree.ParseText(expectedCode);
 
         // Normalize both trees by reformatting them (this removes whitespace/indentation differences)

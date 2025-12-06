@@ -11,16 +11,10 @@ namespace OpenApiSourceGenerator.Processors;
 /// <summary>
 /// Processes OpenAPI schemas and generates code for each schema object
 /// </summary>
-public class SchemaProcessor
+public class SchemaProcessor(PropertyGenerator propertyGenerator, ClassGenerator classGenerator)
 {
-    private readonly PropertyGenerator _propertyGenerator;
-    private readonly ClassGenerator _classGenerator;
-
-    public SchemaProcessor(PropertyGenerator propertyGenerator, ClassGenerator classGenerator)
-    {
-        _propertyGenerator = propertyGenerator ?? throw new ArgumentNullException(nameof(propertyGenerator));
-        _classGenerator = classGenerator ?? throw new ArgumentNullException(nameof(classGenerator));
-    }
+    private readonly PropertyGenerator _propertyGenerator = propertyGenerator ?? throw new ArgumentNullException(nameof(propertyGenerator));
+    private readonly ClassGenerator _classGenerator = classGenerator ?? throw new ArgumentNullException(nameof(classGenerator));
 
     public List<CodeGenerationResult> ProcessSchema(
         KeyValuePair<string, IOpenApiSchema> schema, 
@@ -50,7 +44,7 @@ public class SchemaProcessor
     {
         if (schema.Value.Properties is null)
         {
-            return Enumerable.Empty<PropertyDeclarationSyntax>();
+            return [];
         }
 
         return schema.Value.Properties.Select(property =>

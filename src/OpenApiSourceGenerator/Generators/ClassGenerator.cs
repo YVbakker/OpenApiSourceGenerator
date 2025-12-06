@@ -37,8 +37,30 @@ public class ClassGenerator
             .AddMembers(classDeclaration);
 
         return CompilationUnit()
-            .AddUsings(UsingDirective(ParseName("System")))
+            .AddUsings(DetermineUsings(classDeclaration))
             .AddMembers(namespaceDeclaration)
             .NormalizeWhitespace();
+    }
+
+    private static UsingDirectiveSyntax[] DetermineUsings(ClassDeclarationSyntax classDeclaration)
+    {
+        var usings = new HashSet<UsingDirectiveSyntax>
+        {
+            UsingDirective(ParseName("System"))
+        };
+
+        // Additional usings can be added here based on the properties used in the class
+        
+        // If any property uses collections, add System.Collections.Generic
+        // For now, a check for 'generic' will suffice
+        // If we later want to support more generics we should make this more specific.
+        if (classDeclaration.Members
+            .OfType<PropertyDeclarationSyntax>()
+            .Any(prop => prop.Type is GenericNameSyntax))
+        {
+            usings.Add(UsingDirective(ParseName("System.Collections.Generic")));
+        }
+
+        return usings.ToArray();
     }
 }

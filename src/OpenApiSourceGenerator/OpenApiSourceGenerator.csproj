@@ -5,8 +5,7 @@
         <IsPackable>true</IsPackable>
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
-
-        <Version>0.0.1-alpha</Version>
+        
         <Authors>Yael Bakker</Authors>
         <Description>A C# source generator that automatically generates strongly-typed C# classes
             from OpenAPI specifications at compile time. Supports OpenAPI 3.x with YAML and JSON

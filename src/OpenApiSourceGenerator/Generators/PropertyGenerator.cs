@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.OpenApi;
@@ -14,11 +15,11 @@ namespace OpenApiSourceGenerator.Generators;
 public class PropertyGenerator
 {
     public PropertyDeclarationSyntax GenerateProperty(
-        KeyValuePair<string, IOpenApiSchema> schema, 
+        KeyValuePair<string, IOpenApiSchema> schema,
         ISet<string>? required)
     {
         var propertyDeclaration = CreatePropertyDeclaration(schema);
-        
+
         // Add required modifier if the property is required
         if (required is not null && required.Contains(schema.Key))
         {
@@ -35,37 +36,61 @@ public class PropertyGenerator
             );
     }
 
-    private static PropertyDeclarationSyntax CreatePropertyDeclaration(KeyValuePair<string, IOpenApiSchema> schema)
+    private static PropertyDeclarationSyntax CreatePropertyDeclaration(
+        KeyValuePair<string, IOpenApiSchema> schema)
     {
-        if (schema.Value is not OpenApiSchemaReference reference || schema.Value.Type is not JsonSchemaType.Object)
-        {
-            return schema.Value.Type switch
-            {
-                JsonSchemaType.Null =>
-                    throw new NotImplementedException("Null types are not yet supported"),
+        var name = schema.Key;
+        var type = CreateTypeSyntax(schema.Value, name);
 
-                var primitiveType when TypeMapper.IsPrimitiveType(primitiveType) =>
-                    PropertyDeclaration(
-                        PredefinedType(Token(TypeMapper.GetPrimitiveSyntaxKind(primitiveType))),
-                        Identifier(schema.Key)),
-
-                JsonSchemaType.Object =>
-                    PropertyDeclaration(
-                        ParseTypeName(schema.Key.ToPascalCase()),
-                        Identifier(schema.Key)),
-
-                JsonSchemaType.Array =>
-                    throw new NotImplementedException("Array types are not yet supported"),
-
-                null =>
-                    throw new NotImplementedException("Schema type cannot be null"),
-
-                _ => throw new ArgumentOutOfRangeException(nameof(schema.Value.Type), schema.Value.Type, "Unknown schema type")
-            };
-        }
-        var referenceId = reference.Reference.Id ?? reference.Reference.ReferenceV3 ?? schema.Key;
-        return PropertyDeclaration(
-            ParseTypeName(referenceId.ToPascalCase()), 
-            Identifier(schema.Key));
+        return PropertyDeclaration(type, Identifier(name));
     }
+
+    private static TypeSyntax CreateTypeSyntax(IOpenApiSchema schema, string name)
+    {
+        if (schema is OpenApiSchemaReference schemaReference && schema.Type is JsonSchemaType.Object)
+        {
+            var referenceId = schemaReference.Reference.Id ?? schemaReference.Reference.ReferenceV3 ?? name;
+            return ParseTypeName(referenceId.ToPascalCase());
+        }
+
+        return schema.Type switch
+        {
+            null => throw new NotImplementedException("Schema type cannot be null"),
+            JsonSchemaType.Null => throw new NotImplementedException("Null types are not yet supported"),
+
+            var t when TypeMapper.IsPrimitiveType(t) =>
+                PredefinedType(Token(TypeMapper.GetPrimitiveSyntaxKind(t))),
+
+            JsonSchemaType.Object =>
+                ParseTypeName(name.ToPascalCase()),
+
+            JsonSchemaType.Array =>
+                ListOf(CreateArrayItemTypeSyntax(schema.Items ?? throw new NotImplementedException("Array schema must have items defined"))),
+
+            _ => throw new ArgumentOutOfRangeException(nameof(schema.Type), schema.Type, "Unknown schema type")
+        };
+    }
+
+    private static TypeSyntax CreateArrayItemTypeSyntax(IOpenApiSchema items)
+    {
+        if (items.Type is null)
+            throw new NotImplementedException("Schema type cannot be null");
+
+        return items.Type switch
+        {
+            var t when TypeMapper.IsPrimitiveType(t) =>
+                PredefinedType(Token(TypeMapper.GetPrimitiveSyntaxKind(t))),
+
+            JsonSchemaType.Object => items is OpenApiSchemaReference itemReference
+                ? ParseTypeName((itemReference.Reference.Id ?? throw new InvalidOperationException("Object reference of array type is null")).ToPascalCase())
+                : ParseTypeName((items.Title ?? throw new InvalidOperationException("Title of array object type is null")).ToPascalCase()),
+
+            _ => throw new NotImplementedException("Only primitive, object and array schema types are supported")
+        };
+    }
+
+    private static TypeSyntax ListOf(TypeSyntax itemType) =>
+        GenericName(Identifier("List"))
+            .WithTypeArgumentList(TypeArgumentList(SingletonSeparatedList(itemType)));
+
 }

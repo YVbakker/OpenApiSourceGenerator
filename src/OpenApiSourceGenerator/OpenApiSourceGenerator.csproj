@@ -54,8 +54,7 @@
             PrivateAssets="all" />
         <PackageReference Include="Microsoft.OpenApi" Version="3.0.1" PrivateAssets="all"
             GeneratePathProperty="true" />
-        <PackageReference Include="Microsoft.OpenApi.YamlReader" Version="2.3.6" PrivateAssets="all"
-            GeneratePathProperty="true" />
+        <PackageReference Include="Microsoft.OpenApi.YamlReader" Version="3.0.1" PrivateAssets="all" GeneratePathProperty="true" />
     </ItemGroup>
 
     <PropertyGroup>

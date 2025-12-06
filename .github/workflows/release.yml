@@ -24,9 +24,11 @@ jobs:
 
       - name: Restore
         run: dotnet restore
+        working-directory: ./src/OpenApiSourceGenerator
 
       - name: Build (Release)
         run: dotnet build -c Release --no-restore
+        working-directory: ./src/OpenApiSourceGenerator
 
       - name: Determine version from tag
         id: version
@@ -37,7 +39,8 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Pack
-        run: dotnet pack ./src/OpenApiSourceGenerator/OpenApiSourceGenerator.csproj -c Release --no-build -p:PackageVersion=${{ steps.version.outputs.version }} -o ./artifacts
+        run: dotnet pack -c Release --no-build -p:PackageVersion=${{ steps.version.outputs.version }} -o ../../artifacts
+        working-directory: ./src/OpenApiSourceGenerator
         
       - name: NuGet login (OIDC → temp API key)
         uses: NuGet/login@v1

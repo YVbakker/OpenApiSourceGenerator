@@ -1,3 +1,5 @@
+[![CI](https://github.com/YVbakker/OpenApiSourceGenerator/actions/workflows/ci.yml/badge.svg)](https://github.com/YVbakker/OpenApiSourceGenerator/actions/workflows/ci.yml)
+
 # OpenApiSourceGenerator
 
 A straightforward C# source generator that generates strongly-typed C# classes from OpenAPI specifications (OpenAPI 3.x) at compile time. No additional build steps or tools required!

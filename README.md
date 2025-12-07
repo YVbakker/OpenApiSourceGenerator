@@ -1,4 +1,4 @@
-[![CI](https://github.com/YVbakker/OpenApiSourceGenerator/actions/workflows/ci.yml/badge.svg)](https://github.com/YVbakker/OpenApiSourceGenerator/actions/workflows/ci.yml)
+[![CI](https://github.com/YVbakker/OpenApiSourceGenerator/actions/workflows/ci.yml/badge.svg)](https://github.com/YVbakker/OpenApiSourceGenerator/actions/workflows/ci.yml) [![codecov](https://codecov.io/github/YVbakker/OpenApiSourceGenerator/graph/badge.svg?token=ZV2DNEXJDS)](https://codecov.io/github/YVbakker/OpenApiSourceGenerator)
 
 # OpenApiSourceGenerator
 

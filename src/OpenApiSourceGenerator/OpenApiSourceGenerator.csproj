@@ -51,7 +51,7 @@
             PrivateAssets="all" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.0.0"
             PrivateAssets="all" />
-        <PackageReference Include="Microsoft.OpenApi" Version="3.0.1" PrivateAssets="all"
+        <PackageReference Include="Microsoft.OpenApi" Version="3.0.2" PrivateAssets="all"
             GeneratePathProperty="true" />
         <PackageReference Include="Microsoft.OpenApi.YamlReader" Version="3.0.1" PrivateAssets="all" GeneratePathProperty="true" />
     </ItemGroup>

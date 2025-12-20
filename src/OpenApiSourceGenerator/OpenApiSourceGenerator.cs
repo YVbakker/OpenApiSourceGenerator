@@ -38,7 +38,6 @@ public class OpenApiSourceGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         _openApiReaderSettings.AddYamlReader();
-        _openApiReaderSettings.AddJsonReader();
         
         var provider = context.AdditionalTextsProvider
             .Where(file => file.Path.EndsWith(".yaml", StringComparison.OrdinalIgnoreCase) ||

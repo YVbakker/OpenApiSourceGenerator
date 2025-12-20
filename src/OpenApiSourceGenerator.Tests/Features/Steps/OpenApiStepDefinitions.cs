@@ -101,22 +101,3 @@ public sealed class OpenApiStepDefinitions(ScenarioContext scenarioContext)
         generatedRoot.IsEquivalentTo(expectedRoot).ShouldBeTrue();
     }
 }
-
-// Helper class to create additional files for testing
-internal class TestAdditionalFile : AdditionalText
-{
-    private readonly string _text;
-
-    public TestAdditionalFile(string path, string text)
-    {
-        Path = path;
-        _text = text;
-    }
-
-    public override string Path { get; }
-
-    public override SourceText GetText(System.Threading.CancellationToken cancellationToken = default)
-    {
-        return SourceText.From(_text);
-    }
-}

@@ -38,9 +38,12 @@ public class OpenApiSourceGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         _openApiReaderSettings.AddYamlReader();
+        _openApiReaderSettings.AddJsonReader();
         
         var provider = context.AdditionalTextsProvider
-            .Where(file => file.Path.EndsWith(".yaml", StringComparison.OrdinalIgnoreCase))
+            .Where(file => file.Path.EndsWith(".yaml", StringComparison.OrdinalIgnoreCase) ||
+                           file.Path.EndsWith(".yml", StringComparison.OrdinalIgnoreCase) ||
+                           file.Path.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
             .Collect();
 
         context.RegisterSourceOutput(provider, GenerateCode);
@@ -48,9 +51,16 @@ public class OpenApiSourceGenerator : IIncrementalGenerator
 
     private void GenerateCode(SourceProductionContext context, ImmutableArray<AdditionalText> files)
     {
-        foreach (var text in files.Select(file => file.GetText()).Where(text => text is not null))
+        foreach (var file in files)
         {
-            var (openApiDocument, _) = OpenApiDocument.Parse(text!.ToString(), "yaml", _openApiReaderSettings);
+            var text = file.GetText();
+            if (text is null)
+            {
+                continue;
+            }
+
+            var format = file.Path.EndsWith(".json", StringComparison.OrdinalIgnoreCase) ? "json" : "yaml";
+            var (openApiDocument, _) = OpenApiDocument.Parse(text.ToString(), format, _openApiReaderSettings);
 
             if (openApiDocument is null)
             {

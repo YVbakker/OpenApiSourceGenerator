@@ -11,7 +11,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageReference Include="Microsoft.OpenApi" Version="3.0.2" />
     <PackageReference Include="Microsoft.OpenApi.YamlReader" Version="3.0.2" />
-    <PackageReference Include="Reqnroll.TUnit" Version="3.2.1" />
+    <PackageReference Include="Reqnroll.TUnit" Version="3.3.1" />
     <PackageReference Include="Shouldly" Version="4.3.0" />
     <PackageReference Include="TUnit" Version="1.5.60" />
   </ItemGroup>

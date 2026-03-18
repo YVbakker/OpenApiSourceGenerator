@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="src/OpenApiSourceGenerator.Sample/OpenApiSourceGenerator.Sample.csproj" />
+  <Project Path="src/OpenApiSourceGenerator.Tests/OpenApiSourceGenerator.Tests.csproj" />
+  <Project Path="src/OpenApiSourceGenerator/OpenApiSourceGenerator.csproj" />
+</Solution>

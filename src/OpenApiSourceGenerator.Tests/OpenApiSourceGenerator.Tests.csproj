@@ -13,7 +13,7 @@
     <PackageReference Include="Microsoft.OpenApi.YamlReader" Version="3.3.1" />
     <PackageReference Include="Reqnroll.TUnit" Version="3.3.3" />
     <PackageReference Include="Shouldly" Version="4.3.0" />
-    <PackageReference Include="TUnit" Version="1.19.57" />
+    <PackageReference Include="TUnit" Version="1.23.7" />
   </ItemGroup>
 
   <ItemGroup>

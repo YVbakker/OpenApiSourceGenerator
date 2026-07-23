@@ -6,14 +6,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="5.3.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.3.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
-    <PackageReference Include="Microsoft.OpenApi" Version="3.3.1" />
-    <PackageReference Include="Microsoft.OpenApi.YamlReader" Version="3.3.1" />
-    <PackageReference Include="Reqnroll.TUnit" Version="3.3.4" />
-    <PackageReference Include="Shouldly" Version="4.3.0" />
-    <PackageReference Include="TUnit" Version="1.33.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Microsoft.OpenApi" />
+    <PackageReference Include="Microsoft.OpenApi.YamlReader" />
+    <PackageReference Include="Reqnroll.TUnit" />
+    <PackageReference Include="Shouldly" />
+    <PackageReference Include="TUnit" />
   </ItemGroup>
 
   <ItemGroup>

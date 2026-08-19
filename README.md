@@ -125,6 +125,8 @@ OpenAPI enum schemas generate C# `enum` declarations. Top-level component enums 
 
 String enum values are converted to PascalCase member names by removing non-alphanumeric separators. If multiple values normalize to the same member name, a numeric suffix is appended to keep names stable and unique. Non-negative integer enum values generate members named `Value{number}`, while negative values use `Negative{magnitude}`; all integer members have explicit numeric assignments. For example, `5` becomes `Value5 = 5` and `-5` becomes `Negative5 = -5`; values outside the `int` range use a `long` enum backing type.
 
+Generated string enums use `System.Text.Json.Serialization.JsonStringEnumConverter` with `JsonStringEnumMemberNameAttribute` to preserve the original OpenAPI wire values.
+
 Nullable enum schemas follow the current nullable limitation: generated enum properties are not emitted as nullable, and OAS 3.1 null unions remain unsupported.
 
 ### NotImplementedException Scenarios
@@ -158,8 +160,8 @@ Place OpenAPI files in your project and mark them as `AdditionalFiles`:
 
 ## Requirements
 
-- .NET Standard 2.0 or higher
-- C# 7.3 or higher
+- Consuming projects must target .NET 10 or higher.
+- The source generator assembly targets .NET Standard 2.0 for compiler/analyzer loadability, but the generated code uses modern .NET APIs.
 
 ## How It Works
 

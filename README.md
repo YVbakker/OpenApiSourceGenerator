@@ -165,7 +165,7 @@ Place OpenAPI files in your project and mark them as `AdditionalFiles`:
 
 ## How It Works
 
-This package uses [Roslyn Source Generators](https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview) to analyze OpenAPI specification files during compilation and generate corresponding C# classes. The generated code is added directly to your compilation, providing IntelliSense support and compile-time type checking.
+This package uses [Roslyn Source Generators](https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview) and [Microsoft.OpenApi](https://github.com/Microsoft/OpenAPI.NET) to analyze OpenAPI specification files during compilation and generate corresponding C# classes. The generated code is added directly to your compilation, providing IntelliSense support and compile-time type checking.
 
 ## Support
 

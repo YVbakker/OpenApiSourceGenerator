@@ -123,7 +123,7 @@ The following OpenAPI features are currently **not supported** or only **partial
 
 OpenAPI enum schemas generate C# `enum` declarations. Top-level component enums use the schema name, referenced enum properties use that generated type, and inline property enums generate a separate enum named after the property.
 
-String enum values are converted to PascalCase member names by removing non-alphanumeric separators. If multiple values normalize to the same member name, a numeric suffix is appended to keep names stable and unique. Integer enum values generate members named `Value{number}` with explicit numeric assignments, such as `Value5 = 5`; out-of-range `int` values use a `long` enum backing type.
+String enum values are converted to PascalCase member names by removing non-alphanumeric separators. If multiple values normalize to the same member name, a numeric suffix is appended to keep names stable and unique. Non-negative integer enum values generate members named `Value{number}`, while negative values use `Negative{magnitude}`; all integer members have explicit numeric assignments. For example, `5` becomes `Value5 = 5` and `-5` becomes `Negative5 = -5`; values outside the `int` range use a `long` enum backing type.
 
 Nullable enum schemas follow the current nullable limitation: generated enum properties are not emitted as nullable, and OAS 3.1 null unions remain unsupported.
 

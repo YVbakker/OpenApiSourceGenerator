@@ -62,7 +62,13 @@ components:
         name:
           type: string
         status:
-          type: string
+          $ref: '#/components/schemas/PetStatus'
+    PetStatus:
+      type: string
+      enum:
+      - available
+      - pending
+      - sold
 ```
 
 The generator will create:
@@ -72,7 +78,14 @@ public class Pet
 {
     public int Id { get; set; }
     public string Name { get; set; }
-    public string Status { get; set; }
+    public PetStatus Status { get; set; }
+}
+
+public enum PetStatus
+{
+    Available,
+    Pending,
+    Sold
 }
 ```
 
@@ -83,7 +96,7 @@ var pet = new Pet
 {
     Id = 1,
     Name = "Fluffy",
-    Status = "available"
+    Status = PetStatus.Available
 };
 ```
 
@@ -98,13 +111,21 @@ The following OpenAPI features are currently **not supported** or only **partial
 | Object schemas with primitive/object/array properties | ✅ Supported | Core functionality |
 | `$ref` references | ✅ Supported | Object and array item references |
 | `required` properties | ✅ Supported | Emits C# `required` modifier |
+| `enum` | ✅ Supported | String enum values generate named C# enum members; integer enum values generate named members with numeric assignments. Inline property enums generate a separate enum named after the property. |
 | `format` | ⚠️ Not supported | `format` values are ignored; all `integer` fields map to `int` (e.g. `int64` stays `int`, not `long`) and format modifiers for `string` fields (e.g. `date-time`, `uuid`, `byte`) are ignored, leaving the type as `string`. See [#87](https://github.com/YVbakker/OpenApiSourceGenerator/issues/87) |
-| `enum` | ❌ Not supported | Enum schemas are silently skipped; no C# `enum` type is generated. See [#90](https://github.com/YVbakker/OpenApiSourceGenerator/issues/90) |
 | `nullable` / OAS 3.1 null unions | ❌ Not supported | `type: null` or union types including `null` throw a `NotImplementedException`. See [#88](https://github.com/YVbakker/OpenApiSourceGenerator/issues/88) |
 | `oneOf` / `anyOf` / `allOf` | ❌ Not supported | Composition keywords are not handled and are silently skipped. See [#91](https://github.com/YVbakker/OpenApiSourceGenerator/issues/91) |
 | `additionalProperties` | ❌ Not supported | Dictionary/map schemas are not generated. See [#89](https://github.com/YVbakker/OpenApiSourceGenerator/issues/89) |
-| Non-object top-level schemas | ⚠️ Skipped | Only top-level schemas with `type: object` generate a C# class; other types are silently skipped |
+| Non-object top-level schemas | ⚠️ Partially supported | Top-level enum schemas generate C# enums; other non-object schemas are silently skipped |
 | Array schemas without `items` | ❌ Not supported | Throws `NotImplementedException` at build time |
+
+### Enum Generation
+
+OpenAPI enum schemas generate C# `enum` declarations. Top-level component enums use the schema name, referenced enum properties use that generated type, and inline property enums generate a separate enum named after the property.
+
+String enum values are converted to PascalCase member names by removing non-alphanumeric separators. If multiple values normalize to the same member name, a numeric suffix is appended to keep names stable and unique. Integer enum values generate members named `Value{number}` with explicit numeric assignments, such as `Value5 = 5`; out-of-range `int` values use a `long` enum backing type.
+
+Nullable enum schemas follow the current nullable limitation: generated enum properties are not emitted as nullable, and OAS 3.1 null unions remain unsupported.
 
 ### NotImplementedException Scenarios
 
@@ -119,7 +140,6 @@ The following schema patterns will cause the generator to throw a `NotImplemente
 Until full support is added, consider the following workarounds:
 
 - **`format`**: If you need precise types such as `long`, `DateTimeOffset`, or `Guid`, manually add the generated partial class with the correct property type in your project, or post-process the generated code.
-- **`enum`**: Define the enum type manually in your project and add the generated partial class to reference it.
 - **`nullable`**: Avoid using `type: null` or OAS 3.1 null union types in schemas until support is added in [#88](https://github.com/YVbakker/OpenApiSourceGenerator/issues/88).
 - **`oneOf`/`anyOf`/`allOf`**: Replace composition with explicit property duplication in your spec, or define types manually.
 - **`additionalProperties`**: Define dictionary properties manually.

@@ -47,10 +47,15 @@ public class PropertyGenerator
 
     private static TypeSyntax CreateTypeSyntax(IOpenApiSchema schema, string name)
     {
-        if (schema is OpenApiSchemaReference schemaReference && schema.Type is JsonSchemaType.Object)
+        if (schema is OpenApiSchemaReference schemaReference)
         {
             var referenceId = schemaReference.Reference.Id ?? schemaReference.Reference.ReferenceV3 ?? name;
             return ParseTypeName(referenceId.ToPascalCase());
+        }
+
+        if (EnumGenerator.IsEnumSchema(schema))
+        {
+            return ParseTypeName(name.ToPascalCase());
         }
 
         return schema.Type switch
@@ -73,6 +78,11 @@ public class PropertyGenerator
 
     private static TypeSyntax CreateArrayItemTypeSyntax(IOpenApiSchema items)
     {
+        if (items is OpenApiSchemaReference itemReference)
+        {
+            return ParseTypeName((itemReference.Reference.Id ?? throw new InvalidOperationException("Reference of array type is null")).ToPascalCase());
+        }
+
         if (items.Type is null)
             throw new NotImplementedException("Schema type cannot be null");
 
@@ -81,9 +91,8 @@ public class PropertyGenerator
             var t when TypeMapper.IsPrimitiveType(t) =>
                 PredefinedType(Token(TypeMapper.GetPrimitiveSyntaxKind(t))),
 
-            JsonSchemaType.Object => items is OpenApiSchemaReference itemReference
-                ? ParseTypeName((itemReference.Reference.Id ?? throw new InvalidOperationException("Object reference of array type is null")).ToPascalCase())
-                : ParseTypeName((items.Title ?? throw new InvalidOperationException("Title of array object type is null")).ToPascalCase()),
+            JsonSchemaType.Object =>
+                ParseTypeName((items.Title ?? throw new InvalidOperationException("Title of array object type is null")).ToPascalCase()),
 
             _ => throw new NotImplementedException("Only primitive, object and array schema types are supported")
         };

@@ -23,7 +23,6 @@ public class OpenApiDocumentProcessor
         var documentName = document.Info.Title ?? "GeneratedClasses";
 
         return (document.Components?.Schemas ?? throw new InvalidOperationException("Document has no schemas"))
-            .Where(schema => schema.Value.Type is JsonSchemaType.Object)
             .SelectMany(schema => _schemaProcessor.ProcessSchema(schema, documentName));
     }
 }

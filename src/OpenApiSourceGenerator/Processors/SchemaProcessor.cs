@@ -11,16 +11,26 @@ namespace OpenApiSourceGenerator.Processors;
 /// <summary>
 /// Processes OpenAPI schemas and generates code for each schema object
 /// </summary>
-public class SchemaProcessor(PropertyGenerator propertyGenerator, ClassGenerator classGenerator)
+public class SchemaProcessor(PropertyGenerator propertyGenerator, ClassGenerator classGenerator, EnumGenerator enumGenerator)
 {
     private readonly PropertyGenerator _propertyGenerator = propertyGenerator ?? throw new ArgumentNullException(nameof(propertyGenerator));
     private readonly ClassGenerator _classGenerator = classGenerator ?? throw new ArgumentNullException(nameof(classGenerator));
+    private readonly EnumGenerator _enumGenerator = enumGenerator ?? throw new ArgumentNullException(nameof(enumGenerator));
 
     public List<CodeGenerationResult> ProcessSchema(
         KeyValuePair<string, IOpenApiSchema> schema, 
         string documentName)
     {
         var results = new List<CodeGenerationResult>();
+
+        if (EnumGenerator.IsEnumSchema(schema.Value))
+        {
+            var enumDeclaration = _enumGenerator.GenerateEnum(schema.Key, schema.Value);
+            var enumCompilationUnit = EnumGenerator.GenerateCompilationUnit(documentName, enumDeclaration);
+            results.Add(new CodeGenerationResult(schema.Key, enumCompilationUnit.ToFullString()));
+
+            return results;
+        }
 
         if (schema.Value.Type is not JsonSchemaType.Object)
         {
@@ -51,6 +61,11 @@ public class SchemaProcessor(PropertyGenerator propertyGenerator, ClassGenerator
         {
             // If the property is a nested object (not a reference), process it recursively
             if (property.Value.Type is JsonSchemaType.Object && property.Value is not OpenApiSchemaReference)
+            {
+                results.AddRange(ProcessSchema(property, documentName));
+            }
+
+            if (EnumGenerator.IsEnumSchema(property.Value) && property.Value is not OpenApiSchemaReference)
             {
                 results.AddRange(ProcessSchema(property, documentName));
             }

@@ -48,9 +48,10 @@ public class EnumGenerator
         return enumDeclaration;
     }
 
-    public static bool IsEnumSchema(IOpenApiSchema schema)
+public static bool IsEnumSchema(IOpenApiSchema schema)
     {
-        return schema.Enum is { Count: > 0 };
+        return (schema.Type is JsonSchemaType.String or JsonSchemaType.Integer)
+            && schema.Enum is { Count: > 0 };
     }
 
     public static CompilationUnitSyntax GenerateCompilationUnit(

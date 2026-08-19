@@ -17,9 +17,9 @@ public class PropertyGenerator
     public PropertyDeclarationSyntax GenerateProperty(
         KeyValuePair<string, IOpenApiSchema> schema,
         ISet<string>? required,
-        string? containingSchemaName = null)
+        string? resolvedTypeName = null)
     {
-        var propertyDeclaration = CreatePropertyDeclaration(schema, containingSchemaName);
+        var propertyDeclaration = CreatePropertyDeclaration(schema, resolvedTypeName);
 
         // Add required modifier if the property is required
         if (required is not null && required.Contains(schema.Key))
@@ -39,29 +39,26 @@ public class PropertyGenerator
 
     private static PropertyDeclarationSyntax CreatePropertyDeclaration(
         KeyValuePair<string, IOpenApiSchema> schema,
-        string? containingSchemaName)
+        string? resolvedTypeName)
     {
         var name = schema.Key;
-        var type = CreateTypeSyntax(schema.Value, name, containingSchemaName);
+        var type = CreateTypeSyntax(schema.Value, name, resolvedTypeName);
 
         return PropertyDeclaration(type, Identifier(name));
     }
 
-    private static TypeSyntax CreateTypeSyntax(IOpenApiSchema schema, string name, string? containingSchemaName)
+    private static TypeSyntax CreateTypeSyntax(IOpenApiSchema schema, string name, string? resolvedTypeName)
     {
-        if (schema is OpenApiSchemaReference schemaReference)
+        if (schema is OpenApiSchemaReference schemaReference
+            && (schemaReference.Type is JsonSchemaType.Object || EnumGenerator.IsEnumSchema(schemaReference)))
         {
             var referenceId = schemaReference.Reference.Id ?? schemaReference.Reference.ReferenceV3 ?? name;
             return ParseTypeName(referenceId.ToPascalCase());
         }
 
-        if (EnumGenerator.IsEnumSchema(schema))
+        if (resolvedTypeName is not null)
         {
-            var enumName = containingSchemaName is null
-                ? name.ToPascalCase()
-                : EnumGenerator.CreateInlineEnumName(containingSchemaName, name);
-
-            return ParseTypeName(enumName);
+            return ParseTypeName(resolvedTypeName);
         }
 
         return schema.Type switch
@@ -72,9 +69,6 @@ public class PropertyGenerator
             var t when TypeMapper.IsPrimitiveType(t) =>
                 PredefinedType(Token(TypeMapper.GetPrimitiveSyntaxKind(t))),
 
-            JsonSchemaType.Object =>
-                ParseTypeName(name.ToPascalCase()),
-
             JsonSchemaType.Array =>
                 ListOf(CreateArrayItemTypeSyntax(schema.Items ?? throw new NotImplementedException("Array schema must have items defined"))),
 
@@ -84,7 +78,8 @@ public class PropertyGenerator
 
     private static TypeSyntax CreateArrayItemTypeSyntax(IOpenApiSchema items)
     {
-        if (items is OpenApiSchemaReference itemReference)
+        if (items is OpenApiSchemaReference itemReference
+            && (itemReference.Type is JsonSchemaType.Object || EnumGenerator.IsEnumSchema(itemReference)))
         {
             return ParseTypeName((itemReference.Reference.Id ?? throw new InvalidOperationException("Reference of array type is null")).ToPascalCase());
         }

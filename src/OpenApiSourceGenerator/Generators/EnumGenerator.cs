@@ -22,12 +22,12 @@ public class EnumGenerator
             throw new ArgumentException("Schema does not define enum values", nameof(schema));
         }
 
-var enumValues = schema.Enum;
-var generatedEnumName = enumName.ToPascalCase();
-var usedNames = new HashSet<string>(StringComparer.Ordinal) { generatedEnumName };
-var enumDeclaration = EnumDeclaration(generatedEnumName)
-    .AddModifiers(Token(SyntaxKind.PublicKeyword))
-    .AddMembers([.. enumValues.Select((value, index) => GenerateMember(value, schema.Type, index, usedNames))]);
+        var enumValues = schema.Enum;
+        var generatedEnumName = enumName.ToPascalCase();
+        var usedNames = new HashSet<string>(StringComparer.Ordinal) { generatedEnumName };
+        var enumDeclaration = EnumDeclaration(generatedEnumName)
+            .AddModifiers(Token(SyntaxKind.PublicKeyword))
+            .AddMembers([.. enumValues.Select((value, index) => GenerateMember(value, schema.Type, index, usedNames))]);
 
         if (RequiresLongBackingType(schema))
         {
@@ -42,11 +42,6 @@ var enumDeclaration = EnumDeclaration(generatedEnumName)
     public static bool IsEnumSchema(IOpenApiSchema schema)
     {
         return schema.Enum is { Count: > 0 };
-    }
-
-    public static string CreateInlineEnumName(string containingSchemaName, string propertyName)
-    {
-        return containingSchemaName.ToPascalCase() + propertyName.ToPascalCase();
     }
 
     public static CompilationUnitSyntax GenerateCompilationUnit(
@@ -91,7 +86,7 @@ var enumDeclaration = EnumDeclaration(generatedEnumName)
     {
         if (schemaType is JsonSchemaType.Integer && TryGetIntegerValue(enumValue, out var integerValue))
         {
-            return integerValue < 0 ? $"Negative{Math.Abs(integerValue)}" : $"Value{integerValue}";
+            return CreateIntegerMemberName(integerValue);
         }
 
         var rawName = TryGetStringValue(enumValue, out var stringValue)
@@ -110,6 +105,16 @@ var enumDeclaration = EnumDeclaration(generatedEnumName)
         }
 
         return memberName;
+    }
+
+    private static string CreateIntegerMemberName(long integerValue)
+    {
+        if (integerValue == long.MinValue)
+        {
+            return "Negative9223372036854775808";
+        }
+
+        return integerValue < 0 ? $"Negative{Math.Abs(integerValue)}" : $"Value{integerValue}";
     }
 
     private static string EnsureUniqueName(string memberName, ISet<string> usedNames)

@@ -1,2 +1,8 @@
 {
+	"cucumber.features": [
+		"src/OpenApiSourceGenerator.Tests/Features/**/*.feature"
+	],
+	"cucumber.glue": [
+		"src/OpenApiSourceGenerator.Tests/Features/Steps/**/*.cs"
+	]
 }

@@ -121,7 +121,7 @@ The following OpenAPI features are currently **not supported** or only **partial
 
 ### Enum Generation
 
-OpenAPI enum schemas generate C# `enum` declarations. Top-level component enums use the schema name, referenced enum properties use that generated type, and inline property enums generate a separate enum named after the containing schema and property, such as `PetStatus` for a `status` enum inside `Pet`.
+OpenAPI enum schemas generate C# `enum` declarations. Top-level component enums use the schema name, referenced enum properties use that generated type, and inline property enums generate a separate enum named after the containing schema and property, such as `PetStatus` for a `status` enum inside `Pet`. If that name is already used by another generated type, a numeric suffix is appended, such as `PetStatus2`.
 
 String enum values are converted to PascalCase member names by removing non-alphanumeric separators. If multiple values normalize to the same member name, a numeric suffix is appended to keep names stable and unique. Non-negative integer enum values generate members named `Value{number}`, while negative values use `Negative{magnitude}`; all integer members have explicit numeric assignments. For example, `5` becomes `Value5 = 5` and `-5` becomes `Negative5 = -5`; values outside the `int` range use a `long` enum backing type.
 

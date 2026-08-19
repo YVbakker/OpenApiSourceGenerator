@@ -22,11 +22,12 @@ public class EnumGenerator
             throw new ArgumentException("Schema does not define enum values", nameof(schema));
         }
 
-        var enumValues = schema.Enum;
-        var usedNames = new HashSet<string>(StringComparer.Ordinal);
-        var enumDeclaration = EnumDeclaration(enumName.ToPascalCase())
-            .AddModifiers(Token(SyntaxKind.PublicKeyword))
-            .AddMembers([.. enumValues.Select((value, index) => GenerateMember(value, schema.Type, index, usedNames))]);
+var enumValues = schema.Enum;
+var generatedEnumName = enumName.ToPascalCase();
+var usedNames = new HashSet<string>(StringComparer.Ordinal) { generatedEnumName };
+var enumDeclaration = EnumDeclaration(generatedEnumName)
+    .AddModifiers(Token(SyntaxKind.PublicKeyword))
+    .AddMembers([.. enumValues.Select((value, index) => GenerateMember(value, schema.Type, index, usedNames))]);
 
         if (RequiresLongBackingType(schema))
         {

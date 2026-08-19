@@ -9,9 +9,33 @@ namespace OpenApiSourceGenerator.Processors;
 public sealed class TypeNameAllocator
 {
     private readonly HashSet<string> _allocated = new(StringComparer.Ordinal);
-    private readonly Dictionary<string, string> _allocatedNamesByPreferredName = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, string> _allocatedNamesByComponentKey = new(StringComparer.Ordinal);
 
-    public string Allocate(string preferredName)
+    public string Allocate(string componentKey)
+    {
+        var name = AllocateName(componentKey);
+
+        // Only component keys are resolvable via $ref; nested/inline names must never overwrite these entries.
+        _allocatedNamesByComponentKey[componentKey] = name;
+        return name;
+    }
+
+    public string Resolve(string componentKey)
+    {
+        if (_allocatedNamesByComponentKey.TryGetValue(componentKey, out var name))
+        {
+            return name;
+        }
+
+        throw new InvalidOperationException($"No type name has been allocated for '{componentKey}'.");
+    }
+
+    public string AllocateNested(string containingTypeName, string propertyName)
+    {
+        return AllocateName(containingTypeName + propertyName.ToPascalCase());
+    }
+
+    private string AllocateName(string preferredName)
     {
         var baseName = Sanitize(preferredName);
         var name = baseName;
@@ -21,23 +45,7 @@ public sealed class TypeNameAllocator
             name = baseName + suffix;
         }
 
-        _allocatedNamesByPreferredName[preferredName] = name;
         return name;
-    }
-
-    public string Resolve(string preferredName)
-    {
-        if (_allocatedNamesByPreferredName.TryGetValue(preferredName, out var name))
-        {
-            return name;
-        }
-
-        throw new InvalidOperationException($"No type name has been allocated for '{preferredName}'.");
-    }
-
-    public string AllocateNested(string containingTypeName, string propertyName)
-    {
-        return Allocate(containingTypeName + propertyName.ToPascalCase());
     }
 
     private static string Sanitize(string preferredName)

@@ -73,7 +73,7 @@ public class SchemaProcessor(PropertyGenerator propertyGenerator, ClassGenerator
                 results.AddRange(ProcessSchema(resolvedTypeName, property.Value, documentName, typeNameAllocator));
             }
 
-            return _propertyGenerator.GenerateProperty(property, schema.Required, resolvedTypeName);
+            return _propertyGenerator.GenerateProperty(property, schema.Required, resolvedTypeName, typeNameAllocator);
         })];
     }
 }

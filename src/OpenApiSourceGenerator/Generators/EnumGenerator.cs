@@ -38,11 +38,11 @@ public class EnumGenerator
                             AttributeArgument(TypeOfExpression(IdentifierName("JsonStringEnumConverter")))))))));
         }
 
-        if (RequiresLongBackingType(schema))
+        if (DetermineIntegerBackingTypeKeyword(schema) is { } backingTypeKeyword)
         {
             enumDeclaration = enumDeclaration.WithBaseList(
                 BaseList(SingletonSeparatedList<BaseTypeSyntax>(
-                    SimpleBaseType(PredefinedType(Token(SyntaxKind.LongKeyword))))));
+                    SimpleBaseType(PredefinedType(Token(backingTypeKeyword))))));
         }
 
         return enumDeclaration;
@@ -87,11 +87,7 @@ public class EnumGenerator
         if (schemaType is JsonSchemaType.Integer && TryGetIntegerValue(enumValue, out var integerValue))
         {
             memberDeclaration = memberDeclaration.WithEqualsValue(
-                EqualsValueClause(LiteralExpression(
-                    SyntaxKind.NumericLiteralExpression,
-                    integerValue >= int.MinValue && integerValue <= int.MaxValue
-                        ? Literal((int)integerValue)
-                        : Literal(integerValue))));
+                EqualsValueClause(CreateIntegerLiteral(integerValue)));
         }
         else if (schemaType is JsonSchemaType.String && TryGetStringValue(enumValue, out var stringValue))
         {
@@ -133,14 +129,30 @@ public class EnumGenerator
         return memberName;
     }
 
-    private static string CreateIntegerMemberName(long integerValue)
+    private static string CreateIntegerMemberName(decimal integerValue)
     {
-        if (integerValue == long.MinValue)
+        return integerValue < 0 ? $"Negative{Math.Abs(integerValue)}" : $"Value{integerValue}";
+    }
+
+    private static LiteralExpressionSyntax CreateIntegerLiteral(decimal integerValue)
+    {
+        if (integerValue >= int.MinValue && integerValue <= int.MaxValue)
         {
-            return "Negative9223372036854775808";
+            return LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal((int)integerValue));
         }
 
-        return integerValue < 0 ? $"Negative{Math.Abs(integerValue)}" : $"Value{integerValue}";
+        if (integerValue >= long.MinValue && integerValue <= long.MaxValue)
+        {
+            return LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal((long)integerValue));
+        }
+
+        if (integerValue >= ulong.MinValue && integerValue <= ulong.MaxValue)
+        {
+            return LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal((ulong)integerValue));
+        }
+
+        throw new NotSupportedException(
+            $"Enum value {integerValue} cannot be represented by any C# enum backing type.");
     }
 
     private static string EnsureUniqueName(string memberName, ISet<string> usedNames)
@@ -169,32 +181,13 @@ public class EnumGenerator
         return false;
     }
 
-    private static bool TryGetIntegerValue(JsonNode enumValue, out long value)
+    private static bool TryGetIntegerValue(JsonNode enumValue, out decimal value)
     {
-        if (enumValue is not JsonValue jsonValue)
+        if (enumValue is JsonValue jsonValue
+            && jsonValue.TryGetValue(out decimal decimalValue)
+            && decimalValue == decimal.Truncate(decimalValue))
         {
-            value = 0;
-            return false;
-        }
-
-        if (jsonValue.TryGetValue(out int intValue))
-        {
-            value = intValue;
-            return true;
-        }
-
-        if (jsonValue.TryGetValue(out long longValue))
-        {
-            value = longValue;
-            return true;
-        }
-
-        if (jsonValue.TryGetValue(out decimal decimalValue)
-            && decimalValue == decimal.Truncate(decimalValue)
-            && decimalValue >= long.MinValue
-            && decimalValue <= long.MaxValue)
-        {
-            value = (long)decimalValue;
+            value = decimalValue;
             return true;
         }
 
@@ -202,11 +195,51 @@ public class EnumGenerator
         return false;
     }
 
-    private static bool RequiresLongBackingType(IOpenApiSchema schema)
+    /// <summary>
+    /// Picks the smallest C# enum backing type that fits every value, or throws when the schema
+    /// contains an integer outside the range of any backing type (e.g. beyond ulong.MaxValue) rather
+    /// than silently truncating it to a different wire value.
+    /// </summary>
+    private static SyntaxKind? DetermineIntegerBackingTypeKeyword(IOpenApiSchema schema)
     {
-        return schema.Type is JsonSchemaType.Integer
-            && schema.Enum.Any(value =>
-                TryGetIntegerValue(value, out var integerValue)
-                && (integerValue < int.MinValue || integerValue > int.MaxValue));
+        if (schema.Type is not JsonSchemaType.Integer || schema.Enum is null)
+        {
+            return null;
+        }
+
+        decimal min = 0;
+        decimal max = 0;
+        var hasValue = false;
+
+        foreach (var enumValue in schema.Enum)
+        {
+            if (!TryGetIntegerValue(enumValue, out var integerValue))
+            {
+                continue;
+            }
+
+            min = hasValue ? Math.Min(min, integerValue) : integerValue;
+            max = hasValue ? Math.Max(max, integerValue) : integerValue;
+            hasValue = true;
+        }
+
+        if (!hasValue || (min >= int.MinValue && max <= int.MaxValue))
+        {
+            return null;
+        }
+
+        if (min >= long.MinValue && max <= long.MaxValue)
+        {
+            return SyntaxKind.LongKeyword;
+        }
+
+        if (min >= ulong.MinValue && max <= ulong.MaxValue)
+        {
+            return SyntaxKind.ULongKeyword;
+        }
+
+        throw new NotSupportedException(
+            $"Enum schema contains integer value(s) outside the range that can be represented by a "
+            + $"C# enum backing type (min: {min}, max: {max}).");
     }
 }

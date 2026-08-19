@@ -111,7 +111,7 @@ The following OpenAPI features are currently **not supported** or only **partial
 | Object schemas with primitive/object/array properties | ✅ Supported | Core functionality |
 | `$ref` references | ✅ Supported | Object and array item references |
 | `required` properties | ✅ Supported | Emits C# `required` modifier |
-| `enum` | ✅ Supported | String enum values generate named C# enum members; integer enum values generate named members with numeric assignments. Inline property enums generate a separate enum named after the property. |
+| `enum` | ✅ Supported | String enum values generate named C# enum members; integer enum values generate named members with numeric assignments. Inline property enums generate a separate enum named after the containing schema and property. |
 | `format` | ⚠️ Not supported | `format` values are ignored; all `integer` fields map to `int` (e.g. `int64` stays `int`, not `long`) and format modifiers for `string` fields (e.g. `date-time`, `uuid`, `byte`) are ignored, leaving the type as `string`. See [#87](https://github.com/YVbakker/OpenApiSourceGenerator/issues/87) |
 | `nullable` / OAS 3.1 null unions | ❌ Not supported | `type: null` or union types including `null` throw a `NotImplementedException`. See [#88](https://github.com/YVbakker/OpenApiSourceGenerator/issues/88) |
 | `oneOf` / `anyOf` / `allOf` | ❌ Not supported | Composition keywords are not handled and are silently skipped. See [#91](https://github.com/YVbakker/OpenApiSourceGenerator/issues/91) |
@@ -121,7 +121,7 @@ The following OpenAPI features are currently **not supported** or only **partial
 
 ### Enum Generation
 
-OpenAPI enum schemas generate C# `enum` declarations. Top-level component enums use the schema name, referenced enum properties use that generated type, and inline property enums generate a separate enum named after the property.
+OpenAPI enum schemas generate C# `enum` declarations. Top-level component enums use the schema name, referenced enum properties use that generated type, and inline property enums generate a separate enum named after the containing schema and property, such as `PetStatus` for a `status` enum inside `Pet`.
 
 String enum values are converted to PascalCase member names by removing non-alphanumeric separators. If multiple values normalize to the same member name, a numeric suffix is appended to keep names stable and unique. Integer enum values generate members named `Value{number}` with explicit numeric assignments, such as `Value5 = 5`; out-of-range `int` values use a `long` enum backing type.
 

@@ -43,6 +43,11 @@ public class EnumGenerator
         return schema.Enum is { Count: > 0 };
     }
 
+    public static string CreateInlineEnumName(string containingSchemaName, string propertyName)
+    {
+        return containingSchemaName.ToPascalCase() + propertyName.ToPascalCase();
+    }
+
     public static CompilationUnitSyntax GenerateCompilationUnit(
         string namespaceName,
         EnumDeclarationSyntax enumDeclaration)

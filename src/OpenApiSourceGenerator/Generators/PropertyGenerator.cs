@@ -16,9 +16,10 @@ public class PropertyGenerator
 {
     public PropertyDeclarationSyntax GenerateProperty(
         KeyValuePair<string, IOpenApiSchema> schema,
-        ISet<string>? required)
+        ISet<string>? required,
+        string? containingSchemaName = null)
     {
-        var propertyDeclaration = CreatePropertyDeclaration(schema);
+        var propertyDeclaration = CreatePropertyDeclaration(schema, containingSchemaName);
 
         // Add required modifier if the property is required
         if (required is not null && required.Contains(schema.Key))
@@ -37,15 +38,16 @@ public class PropertyGenerator
     }
 
     private static PropertyDeclarationSyntax CreatePropertyDeclaration(
-        KeyValuePair<string, IOpenApiSchema> schema)
+        KeyValuePair<string, IOpenApiSchema> schema,
+        string? containingSchemaName)
     {
         var name = schema.Key;
-        var type = CreateTypeSyntax(schema.Value, name);
+        var type = CreateTypeSyntax(schema.Value, name, containingSchemaName);
 
         return PropertyDeclaration(type, Identifier(name));
     }
 
-    private static TypeSyntax CreateTypeSyntax(IOpenApiSchema schema, string name)
+    private static TypeSyntax CreateTypeSyntax(IOpenApiSchema schema, string name, string? containingSchemaName)
     {
         if (schema is OpenApiSchemaReference schemaReference)
         {
@@ -55,7 +57,11 @@ public class PropertyGenerator
 
         if (EnumGenerator.IsEnumSchema(schema))
         {
-            return ParseTypeName(name.ToPascalCase());
+            var enumName = containingSchemaName is null
+                ? name.ToPascalCase()
+                : EnumGenerator.CreateInlineEnumName(containingSchemaName, name);
+
+            return ParseTypeName(enumName);
         }
 
         return schema.Type switch

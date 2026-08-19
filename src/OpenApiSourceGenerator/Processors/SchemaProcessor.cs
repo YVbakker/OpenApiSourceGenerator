@@ -67,10 +67,11 @@ public class SchemaProcessor(PropertyGenerator propertyGenerator, ClassGenerator
 
             if (EnumGenerator.IsEnumSchema(property.Value) && property.Value is not OpenApiSchemaReference)
             {
-                results.AddRange(ProcessSchema(property, documentName));
+                var enumName = EnumGenerator.CreateInlineEnumName(schema.Key, property.Key);
+                results.AddRange(ProcessSchema(new KeyValuePair<string, IOpenApiSchema>(enumName, property.Value), documentName));
             }
             
-            return _propertyGenerator.GenerateProperty(property, schema.Value.Required);
+            return _propertyGenerator.GenerateProperty(property, schema.Value.Required, schema.Key);
         });
     }
 }

@@ -1,0 +1,11 @@
+<Project>
+  <Target Name="OpenApiSourceGeneratorValidateTargetFramework" BeforeTargets="CoreCompile">
+    <PropertyGroup>
+      <_OpenApiSourceGeneratorTargetFrameworkVersion>$([System.String]::Copy('$(TargetFrameworkVersion)').TrimStart('v'))</_OpenApiSourceGeneratorTargetFrameworkVersion>
+    </PropertyGroup>
+
+    <Error
+      Condition="'$(TargetFramework)' != '' and ('$(TargetFrameworkIdentifier)' != '.NETCoreApp' or '$(_OpenApiSourceGeneratorTargetFrameworkVersion)' &lt; '10.0')"
+      Text="OpenApiSourceGenerator emits code that requires a .NET 10 or later target framework. Update the consuming project TargetFramework to net10.0 or later." />
+  </Target>
+</Project>

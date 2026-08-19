@@ -26,7 +26,7 @@ public class ClassGenerator
     {
         return ClassDeclaration(className.ToPascalCase())
             .AddModifiers(Token(SyntaxKind.PublicKeyword))
-            .AddMembers(properties.ToArray<MemberDeclarationSyntax>());
+            .AddMembers([.. properties]);
     }
 
     public static CompilationUnitSyntax GenerateCompilationUnit(
@@ -64,6 +64,6 @@ public class ClassGenerator
             usings.Add(UsingDirective(ParseName("System.Collections.Generic")));
         }
 
-        return usings.ToArray();
+        return [.. usings];
     }
 }

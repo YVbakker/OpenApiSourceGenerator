@@ -31,7 +31,8 @@ public class OpenApiSourceGenerator : IIncrementalGenerator
     {
         var propertyGenerator = new PropertyGenerator();
         var classGenerator = new ClassGenerator(propertyGenerator);
-        var schemaProcessor = new SchemaProcessor(propertyGenerator, classGenerator);
+        var enumGenerator = new EnumGenerator();
+        var schemaProcessor = new SchemaProcessor(propertyGenerator, classGenerator, enumGenerator);
         return new OpenApiDocumentProcessor(schemaProcessor);
     }
 

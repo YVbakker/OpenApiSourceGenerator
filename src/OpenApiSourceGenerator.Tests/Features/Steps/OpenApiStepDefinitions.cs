@@ -100,4 +100,46 @@ public sealed class OpenApiStepDefinitions(ScenarioContext scenarioContext)
         // Final equivalence check
         generatedRoot.IsEquivalentTo(expectedRoot).ShouldBeTrue();
     }
+
+    [Then("the following code should be generated for the enum {word}:")]
+    public void ThenTheFollowingCodeShouldBeGeneratedForTheEnum(string enumName, string expectedCode)
+    {
+        var newCompilation = (Compilation)scenarioContext["GeneratedCompilation"];
+
+        var generatedTrees = newCompilation.SyntaxTrees
+            .Where(t => !string.IsNullOrEmpty(t.FilePath))
+            .ToList();
+
+        if (generatedTrees.Count == 0)
+        {
+            throw new Exception("No code was generated");
+        }
+
+        var generatedCode = generatedTrees.First(t =>
+            t.GetRoot()
+                .DescendantNodes()
+                .OfType<EnumDeclarationSyntax>()
+                .Any(c => c.Identifier.ValueText == enumName)
+        );
+
+        var generatedTree = CSharpSyntaxTree.ParseText(generatedCode.ToString());
+        var expectedTree = CSharpSyntaxTree.ParseText(expectedCode);
+
+        var generatedRoot = generatedTree.GetRoot().NormalizeWhitespace();
+        var expectedRoot = expectedTree.GetRoot().NormalizeWhitespace();
+
+        var diff = generatedRoot.FindFirstDiff(expectedRoot);
+
+        if (diff != null)
+        {
+            var message = $"Syntax trees differ: {diff.Message}\n" +
+                          $"Generated: {diff.Left} at {diff.LeftLocation}\n" +
+                          $"Expected: {diff.Right} at {diff.RightLocation}\n\n" +
+                          $"Generated code:\n{generatedRoot.ToFullString()}\n\n" +
+                          $"Expected code:\n{expectedRoot.ToFullString()}";
+            throw new Exception(message);
+        }
+
+        generatedRoot.IsEquivalentTo(expectedRoot).ShouldBeTrue();
+    }
 }

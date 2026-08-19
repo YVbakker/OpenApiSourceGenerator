@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.OpenApi;
+using OpenApiSourceGenerator.Generators;
 using OpenApiSourceGenerator.Model;
 
 namespace OpenApiSourceGenerator.Processors;
@@ -18,12 +19,19 @@ public class OpenApiDocumentProcessor
         _schemaProcessor = schemaProcessor ?? throw new ArgumentNullException(nameof(schemaProcessor));
     }
 
-    public IEnumerable<CodeGenerationResult> ProcessDocument(OpenApiDocument document)
+    public IReadOnlyList<CodeGenerationResult> ProcessDocument(OpenApiDocument document)
     {
         var documentName = document.Info.Title ?? "GeneratedClasses";
+        var schemas = document.Components?.Schemas ?? throw new InvalidOperationException("Document has no schemas");
+        var typeNameAllocator = new TypeNameAllocator();
 
-        return (document.Components?.Schemas ?? throw new InvalidOperationException("Document has no schemas"))
-            .Where(schema => schema.Value.Type is JsonSchemaType.Object)
-            .SelectMany(schema => _schemaProcessor.ProcessSchema(schema, documentName));
+        // Materialized so every component claims its name before any inline type is named
+        var declaredSchemas = schemas
+            .Where(schema => schema.Value.Type is JsonSchemaType.Object || EnumGenerator.IsEnumSchema(schema.Value))
+            .Select(schema => (TypeName: typeNameAllocator.Allocate(schema.Key), schema.Value))
+            .ToList();
+
+        return [.. declaredSchemas.SelectMany(schema =>
+            _schemaProcessor.ProcessSchema(schema.TypeName, schema.Value, documentName, typeNameAllocator))];
     }
 }

@@ -139,10 +139,12 @@ The following `type` + `format` combinations map to more precise C# types. Any o
 | `integer` | `int64` | `long` |
 | `number` | `float` | `float` |
 | `number` | `double` (or unrecognized/none) | `double` |
-| `string` | `date-time` | `DateTimeOffset` |
-| `string` | `uuid` | `Guid` |
+| `string` | `date-time` | `global::System.DateTimeOffset` |
+| `string` | `uuid` | `global::System.Guid` |
 | `string` | `byte` | `byte[]` |
 | `string` | unrecognized/none | `string` |
+
+`DateTimeOffset` and `Guid` are emitted as globally qualified names (`global::System.DateTimeOffset` / `global::System.Guid`) so a component schema with a colliding name (e.g. a schema named `Guid`) cannot shadow the framework type.
 
 ### NotImplementedException Scenarios
 

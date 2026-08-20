@@ -28,8 +28,9 @@ public static class TypeMapper
             (JsonSchemaType.Number, "float") => PredefinedType(Token(SyntaxKind.FloatKeyword)),
             (JsonSchemaType.Number, _) => PredefinedType(Token(SyntaxKind.DoubleKeyword)),
 
-            (JsonSchemaType.String, "date-time") => IdentifierName("DateTimeOffset"),
-            (JsonSchemaType.String, "uuid") => IdentifierName("Guid"),
+            // Globally qualified so a same-named component schema (e.g. "Guid") cannot shadow the framework type.
+            (JsonSchemaType.String, "date-time") => ParseTypeName("global::System.DateTimeOffset"),
+            (JsonSchemaType.String, "uuid") => ParseTypeName("global::System.Guid"),
             (JsonSchemaType.String, "byte") => ArrayType(PredefinedType(Token(SyntaxKind.ByteKeyword)))
                 .WithRankSpecifiers(SingletonList(ArrayRankSpecifier(
                     SingletonSeparatedList<ExpressionSyntax>(OmittedArraySizeExpression())))),

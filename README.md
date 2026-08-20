@@ -156,7 +156,7 @@ The following schema patterns will cause the generator to throw a `NotImplemente
 
 Until full support is added, consider the following workarounds:
 
-- **`format`**: For `format` values not listed in [Format Support](#format-support), manually add the generated partial class with the correct property type in your project, or post-process the generated code.
+- **`format`**: For `format` values not listed in [Format Support](#format-support), post-process the generated code to use the required property type.
 - **`nullable`**: Avoid using `type: null` or OAS 3.1 null union types in schemas until support is added in [#88](https://github.com/YVbakker/OpenApiSourceGenerator/issues/88).
 - **`oneOf`/`anyOf`/`allOf`**: Replace composition with explicit property duplication in your spec, or define types manually.
 - **`additionalProperties`**: Define dictionary properties manually.

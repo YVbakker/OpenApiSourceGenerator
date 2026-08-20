@@ -74,7 +74,7 @@ public class PropertyGenerator
             JsonSchemaType.Null => throw new NotImplementedException("Null types are not yet supported"),
 
             var t when TypeMapper.IsPrimitiveType(t) =>
-                PredefinedType(Token(TypeMapper.GetPrimitiveSyntaxKind(t))),
+                TypeMapper.GetPrimitiveTypeSyntax(t, schema.Format),
 
             JsonSchemaType.Array =>
                 ListOf(CreateArrayItemTypeSyntax(
@@ -102,7 +102,7 @@ public class PropertyGenerator
         return items.Type switch
         {
             var t when TypeMapper.IsPrimitiveType(t) =>
-                PredefinedType(Token(TypeMapper.GetPrimitiveSyntaxKind(t))),
+                TypeMapper.GetPrimitiveTypeSyntax(t, items.Format),
 
             JsonSchemaType.Object =>
                 ParseTypeName((items.Title ?? throw new InvalidOperationException("Title of array object type is null")).ToPascalCase()),

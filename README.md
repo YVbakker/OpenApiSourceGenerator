@@ -112,7 +112,7 @@ The following OpenAPI features are currently **not supported** or only **partial
 | `$ref` references | ✅ Supported | Object and array item references |
 | `required` properties | ✅ Supported | Emits C# `required` modifier |
 | `enum` | ✅ Supported | String enum values generate named C# enum members; integer enum values generate named members with numeric assignments. Inline property enums generate a separate enum named after the containing schema and property. |
-| `format` | ⚠️ Not supported | `format` values are ignored; all `integer` fields map to `int` (e.g. `int64` stays `int`, not `long`) and format modifiers for `string` fields (e.g. `date-time`, `uuid`, `byte`) are ignored, leaving the type as `string`. See [#87](https://github.com/YVbakker/OpenApiSourceGenerator/issues/87) |
+| `format` | ⚠️ Partially supported | Supported `type` + `format` combinations map to more precise C# types (see [Format Support](#format-support) below); unrecognized or missing `format` values deterministically fall back to the base `type` mapping. |
 | `nullable` / OAS 3.1 null unions | ❌ Not supported | `type: null` or union types including `null` throw a `NotImplementedException`. See [#88](https://github.com/YVbakker/OpenApiSourceGenerator/issues/88) |
 | `oneOf` / `anyOf` / `allOf` | ❌ Not supported | Composition keywords are not handled and are silently skipped. See [#91](https://github.com/YVbakker/OpenApiSourceGenerator/issues/91) |
 | `additionalProperties` | ❌ Not supported | Dictionary/map schemas are not generated. See [#89](https://github.com/YVbakker/OpenApiSourceGenerator/issues/89) |
@@ -129,6 +129,23 @@ Generated string enums use `System.Text.Json.Serialization.JsonStringEnumConvert
 
 Nullable enum schemas follow the current nullable limitation: generated enum properties are not emitted as nullable, and OAS 3.1 null unions remain unsupported.
 
+### Format Support
+
+The following `type` + `format` combinations map to more precise C# types. Any other `format` value (including none) falls back to the base `type` mapping shown in parentheses.
+
+| `type` | `format` | C# type |
+|---|---|---|
+| `integer` | `int32` (or unrecognized/none) | `int` |
+| `integer` | `int64` | `long` |
+| `number` | `float` | `float` |
+| `number` | `double` (or unrecognized/none) | `double` |
+| `string` | `date-time` | `global::System.DateTimeOffset` |
+| `string` | `uuid` | `global::System.Guid` |
+| `string` | `byte` | `byte[]` |
+| `string` | unrecognized/none | `string` |
+
+`DateTimeOffset` and `Guid` are emitted as globally qualified names (`global::System.DateTimeOffset` / `global::System.Guid`) so a component schema with a colliding name (e.g. a schema named `Guid`) cannot shadow the framework type.
+
 ### NotImplementedException Scenarios
 
 The following schema patterns will cause the generator to throw a `NotImplementedException` during compilation, which surfaces as a `CS8785` diagnostic:
@@ -141,7 +158,7 @@ The following schema patterns will cause the generator to throw a `NotImplemente
 
 Until full support is added, consider the following workarounds:
 
-- **`format`**: If you need precise types such as `long`, `DateTimeOffset`, or `Guid`, manually add the generated partial class with the correct property type in your project, or post-process the generated code.
+- **`format`**: For `format` values not listed in [Format Support](#format-support), post-process the generated code to use the required property type.
 - **`nullable`**: Avoid using `type: null` or OAS 3.1 null union types in schemas until support is added in [#88](https://github.com/YVbakker/OpenApiSourceGenerator/issues/88).
 - **`oneOf`/`anyOf`/`allOf`**: Replace composition with explicit property duplication in your spec, or define types manually.
 - **`additionalProperties`**: Define dictionary properties manually.

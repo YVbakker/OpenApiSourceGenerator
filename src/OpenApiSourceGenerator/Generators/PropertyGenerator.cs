@@ -49,35 +49,14 @@ public class PropertyGenerator
         var name = schema.Key;
         var type = CreateTypeSyntax(schema.Value, name, resolvedTypeName, typeNameAllocator);
 
-        // Optional reference-type properties may be absent/null, so annotate them as nullable
-        // to avoid CS8618 warnings in consuming projects with <Nullable>enable</Nullable>.
-        if (!isRequired && IsReferenceType(schema.Value, resolvedTypeName, type))
+        // Optional properties may be absent/null, so annotate them as nullable to avoid
+        // CS8618 warnings (reference types) and to distinguish "unset" from a default value type.
+        if (!isRequired)
         {
             type = NullableType(type);
         }
 
         return PropertyDeclaration(type, Identifier(name));
-    }
-
-    private static bool IsReferenceType(IOpenApiSchema schema, string? resolvedTypeName, TypeSyntax type)
-    {
-        if (schema is OpenApiSchemaReference schemaReference && schemaReference.Type is JsonSchemaType.Object)
-        {
-            return !EnumGenerator.IsEnumSchema(schemaReference);
-        }
-
-        if (resolvedTypeName is not null)
-        {
-            return !EnumGenerator.IsEnumSchema(schema);
-        }
-
-        if (schema.Type is JsonSchemaType.Array)
-        {
-            return true;
-        }
-
-        return type is ArrayTypeSyntax
-            || (type is PredefinedTypeSyntax predefined && predefined.Keyword.Kind() is SyntaxKind.StringKeyword);
     }
 
     private static TypeSyntax CreateTypeSyntax(

@@ -31,7 +31,7 @@ Generate C# code from OpenAPI specifications
           {
             public string? Name { get; set; }
       
-            public int Age { get; set; }
+            public int? Age { get; set; }
           }
       }
       """
@@ -118,12 +118,12 @@ Generate C# code from OpenAPI specifications
     {
         public class Pet
         {
-            public long id { get; set; }
+            public long? id { get; set; }
             required public string name { get; set; }
             public Category? category { get; set; }
             required public List<string> photoUrls { get; set; }
             public List<Tag>? tags { get; set; }
-            public PetStatus status { get; set; }
+            public PetStatus? status { get; set; }
         }
     }
     """
@@ -200,7 +200,7 @@ Generate C# code from OpenAPI specifications
     {
         public class Pet
         {
-            public PetStatus status { get; set; }
+            public PetStatus? status { get; set; }
         }
     }
     """
@@ -373,7 +373,7 @@ Generate C# code from OpenAPI specifications
     {
         public class Dog
         {
-            public DogStatus status { get; set; }
+            public DogStatus? status { get; set; }
         }
     }
     """
@@ -405,7 +405,7 @@ Generate C# code from OpenAPI specifications
     {
         public class Cat
         {
-            public CatStatus status { get; set; }
+            public CatStatus? status { get; set; }
         }
     }
     """
@@ -461,7 +461,7 @@ Generate C# code from OpenAPI specifications
     {
         public class Person
         {
-            public int age { get; set; }
+            public int? age { get; set; }
             public List<int>? previousAges { get; set; }
         }
     }
@@ -516,7 +516,7 @@ Generate C# code from OpenAPI specifications
     {
         public class Pet
         {
-            public PetStatus2 status { get; set; }
+            public PetStatus2? status { get; set; }
         }
     }
     """
@@ -664,7 +664,7 @@ Generate C# code from OpenAPI specifications
     {
         public class Account
         {
-            public long balance { get; set; }
+            public long? balance { get; set; }
         }
     }
     """
@@ -696,7 +696,7 @@ Generate C# code from OpenAPI specifications
     {
         public class Account
         {
-            public int balance { get; set; }
+            public int? balance { get; set; }
         }
     }
     """
@@ -728,7 +728,7 @@ Generate C# code from OpenAPI specifications
     {
         public class Measurement
         {
-            public float value { get; set; }
+            public float? value { get; set; }
         }
     }
     """
@@ -760,7 +760,7 @@ Generate C# code from OpenAPI specifications
     {
         public class Measurement
         {
-            public double value { get; set; }
+            public double? value { get; set; }
         }
     }
     """
@@ -791,7 +791,7 @@ Generate C# code from OpenAPI specifications
     {
         public class Measurement
         {
-            public double value { get; set; }
+            public double? value { get; set; }
         }
     }
     """
@@ -823,7 +823,7 @@ Generate C# code from OpenAPI specifications
     {
         public class Event
         {
-            public global::System.DateTimeOffset occurredAt { get; set; }
+            public global::System.DateTimeOffset? occurredAt { get; set; }
         }
     }
     """
@@ -855,7 +855,7 @@ Generate C# code from OpenAPI specifications
     {
         public class Resource
         {
-            public global::System.Guid id { get; set; }
+            public global::System.Guid? id { get; set; }
         }
     }
     """
@@ -900,8 +900,8 @@ Generate C# code from OpenAPI specifications
     {
         public class Resource
         {
-            public global::System.Guid id { get; set; }
-            public global::System.DateTimeOffset createdAt { get; set; }
+            public global::System.Guid? id { get; set; }
+            public global::System.DateTimeOffset? createdAt { get; set; }
         }
     }
     """
@@ -972,8 +972,8 @@ Generate C# code from OpenAPI specifications
         public class Widget
         {
             public string? code { get; set; }
-            public int count { get; set; }
-            public double weight { get; set; }
+            public int? count { get; set; }
+            public double? weight { get; set; }
         }
     }
     """

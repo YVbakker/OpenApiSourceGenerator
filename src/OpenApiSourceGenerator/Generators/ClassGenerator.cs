@@ -59,7 +59,7 @@ public class ClassGenerator
         // If we later want to support more generics we should make this more specific.
         if (classDeclaration.Members
             .OfType<PropertyDeclarationSyntax>()
-            .Any(prop => prop.Type is GenericNameSyntax))
+            .Any(prop => (prop.Type is NullableTypeSyntax nullableType ? nullableType.ElementType : prop.Type) is GenericNameSyntax))
         {
             usings.Add(UsingDirective(ParseName("System.Collections.Generic")));
         }

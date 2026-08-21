@@ -21,10 +21,11 @@ public class PropertyGenerator
         string? resolvedTypeName = null,
         TypeNameAllocator? typeNameAllocator = null)
     {
-        var propertyDeclaration = CreatePropertyDeclaration(schema, resolvedTypeName, typeNameAllocator);
+        var isRequired = required is not null && required.Contains(schema.Key);
+        var propertyDeclaration = CreatePropertyDeclaration(schema, resolvedTypeName, typeNameAllocator, isRequired);
 
         // Add required modifier if the property is required
-        if (required is not null && required.Contains(schema.Key))
+        if (isRequired)
         {
             propertyDeclaration = propertyDeclaration.AddModifiers(Token(SyntaxKind.RequiredKeyword));
         }
@@ -42,12 +43,41 @@ public class PropertyGenerator
     private static PropertyDeclarationSyntax CreatePropertyDeclaration(
         KeyValuePair<string, IOpenApiSchema> schema,
         string? resolvedTypeName,
-        TypeNameAllocator? typeNameAllocator)
+        TypeNameAllocator? typeNameAllocator,
+        bool isRequired)
     {
         var name = schema.Key;
         var type = CreateTypeSyntax(schema.Value, name, resolvedTypeName, typeNameAllocator);
 
+        // Optional reference-type properties may be absent/null, so annotate them as nullable
+        // to avoid CS8618 warnings in consuming projects with <Nullable>enable</Nullable>.
+        if (!isRequired && IsReferenceType(schema.Value, resolvedTypeName, type))
+        {
+            type = NullableType(type);
+        }
+
         return PropertyDeclaration(type, Identifier(name));
+    }
+
+    private static bool IsReferenceType(IOpenApiSchema schema, string? resolvedTypeName, TypeSyntax type)
+    {
+        if (schema is OpenApiSchemaReference schemaReference && schemaReference.Type is JsonSchemaType.Object)
+        {
+            return !EnumGenerator.IsEnumSchema(schemaReference);
+        }
+
+        if (resolvedTypeName is not null)
+        {
+            return !EnumGenerator.IsEnumSchema(schema);
+        }
+
+        if (schema.Type is JsonSchemaType.Array)
+        {
+            return true;
+        }
+
+        return type is ArrayTypeSyntax
+            || (type is PredefinedTypeSyntax predefined && predefined.Keyword.Kind() is SyntaxKind.StringKeyword);
     }
 
     private static TypeSyntax CreateTypeSyntax(

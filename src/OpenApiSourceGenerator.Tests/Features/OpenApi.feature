@@ -29,7 +29,7 @@ Generate C# code from OpenAPI specifications
       {
         public class Person
           {
-            public string Name { get; set; }
+            public string? Name { get; set; }
       
             public int Age { get; set; }
           }
@@ -120,9 +120,9 @@ Generate C# code from OpenAPI specifications
         {
             public long id { get; set; }
             required public string name { get; set; }
-            public Category category { get; set; }
+            public Category? category { get; set; }
             required public List<string> photoUrls { get; set; }
-            public List<Tag> tags { get; set; }
+            public List<Tag>? tags { get; set; }
             public PetStatus status { get; set; }
         }
     }
@@ -264,8 +264,8 @@ Generate C# code from OpenAPI specifications
     {
         public class Container
         {
-            public Type200Response response { get; set; }
-            public List<GeneratedType> values { get; set; }
+            public Type200Response? response { get; set; }
+            public List<GeneratedType>? values { get; set; }
         }
     }
     """
@@ -462,7 +462,7 @@ Generate C# code from OpenAPI specifications
         public class Person
         {
             public int age { get; set; }
-            public List<int> previousAges { get; set; }
+            public List<int>? previousAges { get; set; }
         }
     }
     """
@@ -606,7 +606,7 @@ Generate C# code from OpenAPI specifications
     {
         public class PetStatus
         {
-            public string label { get; set; }
+            public string? label { get; set; }
         }
     }
     """
@@ -619,7 +619,7 @@ Generate C# code from OpenAPI specifications
     {
         public class Pet
         {
-            public PetStatus2 status { get; set; }
+            public PetStatus2? status { get; set; }
         }
     }
     """
@@ -632,7 +632,7 @@ Generate C# code from OpenAPI specifications
     {
         public class PetStatus2
         {
-            public string code { get; set; }
+            public string? code { get; set; }
         }
     }
     """
@@ -933,7 +933,7 @@ Generate C# code from OpenAPI specifications
     {
         public class Attachment
         {
-            public byte[] content { get; set; }
+            public byte[]? content { get; set; }
         }
     }
     """
@@ -971,7 +971,7 @@ Generate C# code from OpenAPI specifications
     {
         public class Widget
         {
-            public string code { get; set; }
+            public string? code { get; set; }
             public int count { get; set; }
             public double weight { get; set; }
         }
@@ -1008,7 +1008,7 @@ Generate C# code from OpenAPI specifications
     {
         public class Ledger
         {
-            public List<long> balances { get; set; }
+            public List<long>? balances { get; set; }
         }
     }
     """

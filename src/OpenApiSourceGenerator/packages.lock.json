@@ -37,12 +37,12 @@
       },
       "Microsoft.OpenApi.YamlReader": {
         "type": "Direct",
-        "requested": "[3.10.0, )",
-        "resolved": "3.10.0",
-        "contentHash": "+3nJM24rXJgDlNI77H8w6F1OEL1nAGFd7c1iu+lNjoeZUde63OAEEdvtKVr+KbSdrL0ITnmBY+6xsN0Y1v+rEg==",
+        "requested": "[3.10.2, )",
+        "resolved": "3.10.2",
+        "contentHash": "qVWoRH8gBWcs2C67e5crYLXPPqK3O8VbzN9G4nxC3Ykjv+Vjv6BJZXx9WyAohe2UT5ZOkHr4LdLJ/ZpaptWdZQ==",
         "dependencies": {
-          "Microsoft.OpenApi": "3.10.0",
-          "SharpYaml": "2.1.4",
+          "Microsoft.OpenApi": "3.10.2",
+          "SharpYaml": "2.1.5",
           "System.Text.Json": "8.0.5"
         }
       },
@@ -70,8 +70,8 @@
       },
       "SharpYaml": {
         "type": "Transitive",
-        "resolved": "2.1.4",
-        "contentHash": "/iwULhVBpTjD4wPZhLU+eUWBanDvri/2AGx5YbaAj5kp9kXzhqUfJEy56H5Yi+c+OXsdm/oKD1aTKB24BFp8cw=="
+        "resolved": "2.1.5",
+        "contentHash": "1pNSpfXxNAgCQ9sacKKpEWO2DxTefoLEjw0v1nWMvyJScUWacoHvjXr4LfcUkhm0qYgNYripFFiUeEzW4tdXIQ=="
       },
       "System.Buffers": {
         "type": "Transitive",
